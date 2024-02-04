@@ -39,12 +39,3 @@ function getURLsFromHTML(htmlBody, baseURL) {
 }
 
 
-// main()
-// async function main() {
-
-//     const url = 'http://blog.boot.dev'
-//     const body = await JSDOM.fromURL(url).then(dom => {
-//         return dom.serialize()
-//     });
-//     console.log(getURLsFromHTML(body, url))
-// }
