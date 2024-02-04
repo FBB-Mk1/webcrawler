@@ -1,4 +1,4 @@
-const { getURLsFromHTML } = require("./crawl")
+const { getURLsFromHTML, crawlPage } = require("./crawl")
 
 function main() {
 
@@ -6,18 +6,16 @@ function main() {
         console.log("Invalid Input, need a valid URL")
         process.exit()
     }
-
+    let url
     try {
-        const url = new URL(process.argv[2])
-        fetch(url).then(data => {
-            data.text().then(text => {
-                const urls = getURLsFromHTML(text, url)
-                console.log(urls)
-            })
-        })
+        url = new URL(process.argv[2])
     } catch (err) {
         console.log(err)
     }
+
+    crawlPage(url)
+
+
 
 
 }

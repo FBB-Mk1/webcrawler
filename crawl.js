@@ -1,6 +1,7 @@
 module.exports = {
     normalizeURL,
-    getURLsFromHTML
+    getURLsFromHTML,
+    crawlPage
 }
 
 const { JSDOM } = require('jsdom')
@@ -36,6 +37,28 @@ function getURLsFromHTML(htmlBody, baseURL) {
         }
     }
     return links
+}
+
+async function crawlPage(url) {
+    let response
+    try {
+        response = await fetch(url)
+    } catch (err) {
+        console.log(err)
+    }
+    if (response.status > 400) {
+        console.log(`Can't continue due to error: ${response.status}`)
+        process.exit()
+    }
+    if (response.headers.get('content-type').includes('text/html')) {
+        const text = await response.text()
+        const urls = getURLsFromHTML(text, url)
+        console.log(urls)
+    } else {
+        console.log('not cool')
+        process.exit()
+    }
+
 }
 
 
