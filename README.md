@@ -1,6 +1,6 @@
 # Webcrawler
 
-CLI tool to get a list of URLs from a starting URL
+Tool for checking internal links to a URL
 
 Use:
 
