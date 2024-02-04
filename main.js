@@ -1,4 +1,5 @@
 const { getURLsFromHTML, crawlPage } = require("./crawl")
+const { printReport } = require("./report.js")
 
 async function main() {
 
@@ -12,9 +13,9 @@ async function main() {
     } catch (err) {
         console.log(`${err}: Invalid URL`)
     }
-    let result = await crawlPage(url, url)
+    let pages = await crawlPage(url, url)
 
-    console.log(result)
+    printReport(pages)
     process.exit()
 
 }
