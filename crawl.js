@@ -39,26 +39,54 @@ function getURLsFromHTML(htmlBody, baseURL) {
     return links
 }
 
-async function crawlPage(url) {
-    let response
+async function crawlPage(baseURL, currentURL, pages = {}) {
+
+    // Make sure the currentURL is on the same domain as the baseURL.If it's not, just return the current pages. We don't want to crawl the entire internet, just the domain in question.
+    if (baseURL.hostname !== currentURL.hostname) {
+        return pages
+    }
+    // Get a normalized version of the currentURL.
+    const currentNormalized = normalizeURL(currentURL)
+    // If the pages object already has an entry for the normalized version of the current URL, just increment the count and return the current pages.
+    if (currentNormalized in pages) {
+        pages[currentNormalized] += 1
+        return pages
+    }
+    // Otherwise, add an entry to the pages object for the normalized version of the current URL, and set the count to 1 as long as the current url isn't the base url (the first page we're crawling). 
+    // Set it to 0 if it is the base url.
+    else {
+        if (normalizeURL(baseURL) !== currentNormalized) {
+            pages[currentNormalized] = 1
+        } else {
+            pages[currentNormalized] = 0
+        }
+    }
+    // If we've gotten here, we haven't yet made a request to the current URL, so let's do that, and maybe add a console.log so you can watch your crawler go in real-time.
     try {
-        response = await fetch(url)
+        console.log(`fetching: ${currentURL.href}`)
+        const response = await fetch(currentURL)
+        // Assuming all went well with the fetch request, get all the URLs from the response body HTML
+        if (response.ok) {
+            let urls
+            if (response.headers.get('content-type').includes('text/html')) {
+                const text = await response.text()
+                urls = getURLsFromHTML(text, currentURL)
+            }
+            if (urls) {
+                // Recursively crawl each URL you found on the page and update the pages to keep an aggregate count
+                for (let url of urls) {
+                    next = new URL(url)
+                    await crawlPage(baseURL, next, pages)
+                }
+            }
+        }
     } catch (err) {
-        console.log(err)
+        console.log(`${err}: ${currentNormalized}`)
     }
-    if (response.status > 400) {
-        console.log(`Can't continue due to error: ${response.status}`)
-        process.exit()
-    }
-    if (response.headers.get('content-type').includes('text/html')) {
-        const text = await response.text()
-        const urls = getURLsFromHTML(text, url)
-        console.log(urls)
-    } else {
-        console.log('not cool')
-        process.exit()
-    }
+    // Finally, return the updated pages object
+    return pages;
 
 }
+
 
 

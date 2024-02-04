@@ -1,6 +1,6 @@
 const { getURLsFromHTML, crawlPage } = require("./crawl")
 
-function main() {
+async function main() {
 
     if (process.argv.length !== 3) {
         console.log("Invalid Input, need a valid URL")
@@ -12,11 +12,10 @@ function main() {
     } catch (err) {
         console.log(err)
     }
+    let result = await crawlPage(url, url)
 
-    crawlPage(url)
-
-
-
+    console.log(result)
+    process.exit()
 
 }
 
